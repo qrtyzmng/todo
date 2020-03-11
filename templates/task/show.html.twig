@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ task.name }}
+    <div>
+        <a href="{{ path('task_add') }}">Add new Task</a>
+    </div>
+{% endblock %}
