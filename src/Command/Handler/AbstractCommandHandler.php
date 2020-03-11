@@ -12,12 +12,6 @@ abstract class AbstractCommandHandler implements MessageHandlerInterface
      * @var EntityManagerInterface 
      */
     protected $entityManager;
-    
-    /**
-     *
-     * @var TaskRepository 
-     */
-    protected $taskRepository;
 
     public function __construct(EntityManagerInterface $em)
     {

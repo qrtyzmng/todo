@@ -14,9 +14,7 @@ class AddTaskCommandHandler extends AbstractCommandHandler
         $newTask->setIsDone($command->getIsDone());
         $newTask->setCreatedAt($command->getCreatedAt());
         $newTask->setUpdatedAt($command->getUpdatedAt());
-        
-        $this->taskRepository->add($newTask);
-        
+            
         $this->entityManager->persist($newTask);
         $this->entityManager->flush();
     }
