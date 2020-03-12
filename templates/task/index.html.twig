@@ -1,5 +1,51 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <h1>Tasks</h1>
+    <table class="table">
+        <thead class="tableHead">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td>{{ task.id }}</td>
+                    <td>{{ task.name }}</td>
+                    <td>{% if task.isDone == false%} To do {% else %} Done {% endif %}</td>
+                    <td>{{ task.createdAt|date("Y-m-d H:i:s") }}</td>
+                    <td>
+                        <a href="{{ path('task_edit', {id:task.id}) }}">Edit</a>
+                        <a href="{{ path('task_show', {id:task.id}) }}">Show</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if maxPages > 1 %}
+        <nav>
+            <ul class="pagination">
+                <li class="page-item{{ currentPage == 1 ? ' disabled' }}">
+                    <a class="page-link" href="{{ path('task_index', {page: currentPage-1 < 1 ? 1 : currentPage-1}) }}">«</a>
+                </li>
+
+                {% for i in 1..maxPages %}
+                    <li class="page-item{{ currentPage == i ? ' active' }}">
+                        <a class="page-link" href="{{ path('task_index', {page: i}) }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item{{ currentPage == maxPages ? ' disabled' }}">
+                    <a class="page-link"
+                       href="{{ path('task_index', {page: currentPage+1 <= maxPages ? currentPage+1 : currentPage}) }}">»</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
     <a href="{{ path('task_add') }}">Add new Task</a>
 {% endblock %}

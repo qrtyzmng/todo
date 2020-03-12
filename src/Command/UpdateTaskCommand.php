@@ -3,8 +3,13 @@
 namespace App\Command;
 
 
-class AddTaskCommand
+class UpdateTaskCommand
 {
+    /**
+     * @var int
+     */
+    private $id;
+    
     /**
      * @var string
      */
@@ -18,24 +23,28 @@ class AddTaskCommand
     /**
      * @var \DateTime
      */
-    private $createdAt;
-
-    /**
-     * @var \DateTime
-     */
     private $updatedAt;
 
     /**
      * 
+     * @param int $id
      * @param string $name
+     * @param bool $isDone
      */
-    public function __construct(string $name)
+    public function __construct(int $id, string $name, bool $isDone)
     {
+        $this->id = $id;
         $this->name = $name;
-        $this->isDone = false;
-        $currentDate = new \DateTime('now');
-        $this->createdAt = $currentDate;
-        $this->updatedAt = $currentDate;
+        $this->isDone = $isDone;
+        $this->updatedAt = new \DateTime('now');
+    }
+    
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     /**
@@ -54,15 +63,6 @@ class AddTaskCommand
     public function getIsDone(): bool
     {
         return $this->isDone;
-    }
-    
-    /**
-     * 
-     * @return \DateTimeInterface
-     */
-    public function getCreatedAt(): \DateTimeInterface
-    {
-        return $this->createdAt;
     }
     
     /**

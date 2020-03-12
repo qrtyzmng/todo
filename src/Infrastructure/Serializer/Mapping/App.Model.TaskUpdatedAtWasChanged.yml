@@ -1,0 +1,10 @@
+App\Model\TaskUpdatedAtWasChanged:
+    exclusion_policy: ALL
+
+    properties:
+        taskId:
+            type: int
+            serialized_name: task_id
+
+        updatedAt:
+            type: DateTime<'Y-m-d H:i:s'>   

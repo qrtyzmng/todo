@@ -4,7 +4,7 @@ namespace App\Query\Handler;
 
 use App\Query\TaskQuery;
 
-class ProductQueryHandler extends AbstractQueryHandler
+class TasksQueryHandler extends AbstractQueryHandler
 {
     public function __invoke(TaskQuery $query)
     {

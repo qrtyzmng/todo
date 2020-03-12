@@ -1,0 +1,10 @@
+App\Model\TaskNameWasChanged:
+    exclusion_policy: ALL
+
+    properties:
+        taskId:
+            type: int
+            serialized_name: task_id
+
+        name:
+            type: string   

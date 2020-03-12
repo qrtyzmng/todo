@@ -1,0 +1,19 @@
+App\Model\TaskWasCreated:
+    exclusion_policy: ALL
+
+    properties:
+        taskId:
+            type: int
+            serialized_name: task_id
+
+        name:
+            type: string
+
+        isDone:
+            type: bool
+            
+        createdAt:
+            type: DateTime<'Y-m-d H:i:s'>
+         
+        updatedAt:
+            type: DateTime<'Y-m-d H:i:s'>     

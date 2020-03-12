@@ -3,12 +3,20 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Shared\AggregateRoot;
+use App\Shared\DomainEventsHistory;
+use App\Command\AddTaskCommand;
+use App\Model\TaskNameWasChanged;
+use App\Model\TaskIsDoneWasChanged;
+use App\Model\TaskUpdatedAtWasChanged;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
  */
-class Task
+class Task extends AggregateRoot
 {
+    const NUM_ITEMS = 10;
+    
     /**
      * @var int
      * @ORM\Id()
@@ -40,6 +48,28 @@ class Task
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+    
+    /**
+     * 
+     * @param \App\Entity\AddTaskCommand $command
+     * @return \App\Entity\Task
+     */
+    public static function create(AddTaskCommand $command): Task
+    {
+        $newTask = new Task();
+        $newTask->setName($command->getName());
+        $newTask->setIsDone($command->getIsDone());
+        $newTask->setCreatedAt($command->getCreatedAt());
+        $newTask->setUpdatedAt($command->getUpdatedAt());
+        return $newTask;
+    }
+    
+    private static function createEmptyTaskWithId(AggregateId $taskId)
+    {
+        $task = new Task();
+        $task->setId($taskId);
+        return $task;
+    }
 
     /**
      * 
@@ -49,6 +79,15 @@ class Task
     {
         return $this->id;
     }
+    
+    /**
+     * 
+     * @param int $id
+     */
+    protected function setId(int $id)
+    {
+        $this->id = $id;
+    }
 
     /**
      * 
@@ -57,6 +96,18 @@ class Task
     public function getName(): ?string
     {
         return $this->name;
+    }
+    
+    public function changeName(string $newName)
+    {
+        if ($newName === $this->name) {
+            return;
+        }
+        
+        $this->setName($newName);
+        $this->recordThat(
+            new TaskNameWasChanged($this->id, $newName)
+        );
     }
     
     /**
@@ -84,6 +135,17 @@ class Task
     public function setIsDone(?bool $isDone)
     {
         $this->isDone = $isDone;
+    }
+    
+    public function changeIsDone(bool $isDone)
+    {
+        if ($isDone === $this->isDone) {
+            return;
+        }
+        $this->setIsDone($isDone);
+        $this->recordThat(
+            new TaskIsDoneWasChanged($this->id, $isDone)
+        );
     }
 
     /**
@@ -120,5 +182,27 @@ class Task
     public function setUpdatedAt(?\DateTimeInterface $updatedAt)
     {
         $this->updatedAt = $updatedAt;
+    }
+    
+    public function changeUpdatedAt(?\DateTimeInterface $updatedAt)
+    {
+        if ($updatedAt === $this->updatedAt) {
+            return;
+        }
+        $this->setUpdatedAt($updatedAt);
+        $this->recordThat(
+            new TaskUpdatedAtWasChanged($this->id, $updatedAt)
+        );
+    }
+    
+    public static function reconstituteFromHistory(DomainEventsHistory $eventsHistory)
+    {
+        $task = static::createEmptyTaskWithId($eventsHistory->getAggregateId());
+
+        foreach ($eventsHistory as $event) {
+            $task->apply($event);
+        }
+
+        return $task;
     }
 }

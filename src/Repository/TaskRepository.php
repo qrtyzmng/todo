@@ -23,4 +23,24 @@ class TaskRepository extends ServiceEntityRepository
         parent::__construct($registry, Task::class);
     }
     
+    public function countElements()
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder('t');
+        $qb->select('count(t.id)');
+        $qb->from('App:Task', 't');
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+    
+    public function fetchAll(int $page, int $perPage): array
+    {
+        $offset = ($page - 1) * $perPage;
+        
+        $qb = $this->getEntityManager()->createQueryBuilder('t');
+        $qb->select('t');
+        $qb->from('App:Task', 't');
+        $qb->setMaxResults($perPage);
+        $qb->setFirstResult($offset);
+        $qb->orderBy('t.id', 'DESC');
+        return $qb->getQuery()->getResult();
+    }
 }
