@@ -97,7 +97,7 @@ class TaskController extends BaseController {
      *
      * @return Response
      */
-    public function edit(int $id, Request $request)
+    public function edit(int $id, Request $request): Response
     {
         $taskQuery = new TaskQuery($id);
 
