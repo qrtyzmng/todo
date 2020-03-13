@@ -9,6 +9,9 @@ use App\Command\AddTaskCommand;
 use App\Model\TaskNameWasChanged;
 use App\Model\TaskIsDoneWasChanged;
 use App\Model\TaskUpdatedAtWasChanged;
+use App\Shared\DomainEvent;
+use App\Model\TaskWasCreated;
+use App\Shared\ClassNameHelper;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
@@ -64,7 +67,12 @@ class Task extends AggregateRoot
         return $newTask;
     }
     
-    private static function createEmptyTaskWithId(AggregateId $taskId)
+    /**
+     * 
+     * @param int $taskId
+     * @return \App\Entity\Task
+     */
+    private static function createEmptyTaskWithId(int $taskId)
     {
         $task = new Task();
         $task->setId($taskId);
@@ -198,11 +206,40 @@ class Task extends AggregateRoot
     public static function reconstituteFromHistory(DomainEventsHistory $eventsHistory)
     {
         $task = static::createEmptyTaskWithId($eventsHistory->getAggregateId());
-
-        foreach ($eventsHistory as $event) {
+        
+        foreach ($eventsHistory as $event) {        
             $task->apply($event);
         }
 
         return $task;
+    }
+    
+    protected function apply(DomainEvent $event)
+    {
+        $method = 'apply'.ClassNameHelper::getShortClassName(get_class($event));
+        $this->$method($event);
+    }
+    
+    protected function applyTaskWasCreated(TaskWasCreated $event)
+    {
+        $this->name = $event->getName();
+        $this->isDone = $event->getIsDone();
+        $this->createdAt = $event->getCreatedAt();
+        $this->updatedAt = $event->getUpdatedAt();
+    }
+
+    protected function applyTaskNameWasChanged(TaskNameWasChanged $event)
+    {
+        $this->name = $event->getName();
+    }
+    
+    protected function applyTaskIsDoneWasChanged(TaskIsDoneWasChanged $event)
+    {
+        $this->isDone = $event->getIsDone();
+    }
+    
+    protected function applyTaskUpdatedAtWasChanged(TaskUpdatedAtWasChanged $event)
+    {
+        $this->updatedAt = $event->getUpdatedAt();
     }
 }

@@ -5,22 +5,22 @@ namespace App\Shared;
 class DomainEventsHistory extends DomainEvents
 {
     /**
-     * @var AggregateId
+     * @var int
      */
     private $aggregateId;
 
     /**
-     * @param AggregateId   $aggregateId
+     * @param int   $aggregateId
      * @param DomainEvent[] $events
      */
-    public function __construct(AggregateId $aggregateId, $events)
+    public function __construct(int $aggregateId, $events)
     {
         $this->aggregateId = $aggregateId;
 
         parent::__construct($events);
     }
 
-    public function getAggregateId(): AggregateId
+    public function getAggregateId(): int
     {
         return $this->aggregateId;
     }
